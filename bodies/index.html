@@ -396,6 +396,41 @@ function mini(L, H, note, label) {
   return { group: g, name: label, note };
 }
 
+// VL Commodore styled as a 2-door wagon (Holden never built one).
+function vlWagon(L, H, note, label) {
+  const W = 650, xf = L / 2, xr = -L / 2, yb = 82;
+  const belt = H * 0.55, fl = H * 0.44, top = H * 0.93;
+  const ws = xf - L * 0.31;                     // windscreen base: long bonnet
+  const wsTop = ws - (top - belt) * 0.95;       // raked screen
+  const g = carShell({
+    W, yb, color: 0x8c6a36,
+    top: [[xf - 10, yb], [xf + 4, H * 0.25, 10], [xf, fl, 20], [ws, belt - 4, 60], [xr + 10, belt, 30], [xr - 2, H * 0.3, 20], [xr + 4, yb]],
+    glass: [[ws + 8, belt - 18], [wsTop, top, 24], [xr + 18, top, 14], [xr + 8, belt - 10]],
+    roof: [[wsTop + 4, top - 8], [wsTop, H, 10], [xr + 8, H, 8], [xr + 12, top - 8]],
+  });
+  const paint = g.userData.paint, glassZ = W / 2 - 34 + 3;
+  // B and C pillars: one long door, then quarter and cargo windows
+  const xb = ws - L * 0.25, xc = xr + L * 0.17;
+  for (const x of [xb, xc]) g.add(box(x - L * 0.015, x + L * 0.015, belt - 10, top, -glassZ, glassZ, paint));
+  for (const s of [-1, 1]) {
+    // door shut lines, kept above the wheel arches
+    for (const x of [ws + 6, xb]) {
+      const y0 = Math.abs(Math.abs(x) - AX) < 112 ? 200 : yb + 30;
+      g.add(box(x - 1.5, x + 1.5, y0, belt - 6, s * W / 2 - 1, s * W / 2 + 1, M.black()));
+    }
+    g.add(box(xb - 70, xb - 30, belt - 30, belt - 24, s * W / 2 - 1, s * W / 2 + 2, M.chrome()));   // door handle
+    // slim headlights, wrap-around indicators, tail lights, roof rails
+    g.add(box(xf - 6, xf + 4, H * 0.34, H * 0.42, s * W * 0.18, s * W * 0.43, M.lamp()));
+    g.add(box(xf - 20, xf + 2, H * 0.34, H * 0.42, s * W * 0.43, s * (W / 2 - 4), M.amber()));
+    g.add(box(xr - 6, xr + 4, H * 0.32, H * 0.46, s * W * 0.28, s * W * 0.47, M.tail()));
+    g.add(box(wsTop - 20, xr + 30, H + 4, H + 14, s * W * 0.36, s * W * 0.40, M.black()));
+  }
+  g.add(box(xf - 6, xf + 6, H * 0.34, H * 0.42, -W * 0.17, W * 0.17, M.black()));
+  g.add(box(xf - 8, xf + 14, H * 0.15, H * 0.26, -W / 2 + 6, W / 2 - 6, M.black()));
+  g.add(box(xr - 14, xr + 8, H * 0.15, H * 0.26, -W / 2 + 6, W / 2 - 6, M.black()));
+  return { group: g, name: label, note };
+}
+
 function x5() {
   const W = 650, L = 780, H = 640, xf = L / 2, xr = -L / 2, yb = 96;
   const g = carShell({
@@ -531,6 +566,8 @@ function skidSteer() {
 const BODIES = [
   { id: 'mini', label: 'Mini · chibi', make: () => mini(720, 560, 'Squashed to fit the frame. 720 long on a 370 wheelbase, so it reads as a cartoon Mini: mostly face and roof.', 'Classic Mini, chibi') },
   { id: 'mini-long', label: 'Mini · stretched', make: () => mini(1000, 480, 'Overhangs pushed out to about 1000 long. Still only about 1.7× its width (a real Mini is 2.2×), and the overhangs will dig in on sand.', 'Classic Mini, stretched') },
+  { id: 'vl-long', label: 'VL wagon · stretched', make: () => vlWagon(1200, 470, 'Two-door wagon, which Holden never made. Overhangs pushed out to about 1200 long, so it is roughly 2× its width (a real VL is about 2.8×). The 430 mm overhangs will dig in on sand.', 'VL Commodore 2-door wagon, stretched') },
+  { id: 'vl', label: 'VL wagon · chibi', make: () => vlWagon(760, 520, 'Two-door wagon, squashed to 760 long. The long VL bonnet and flat wagon roof still read, just cartoon-short.', 'VL Commodore 2-door wagon, chibi') },
   { id: 'x5', label: 'X5 E70', make: x5 },
   { id: 'colorado', label: 'RC Colorado', make: colorado },
   { id: 'yaris', label: 'Yaris', make: yaris },
