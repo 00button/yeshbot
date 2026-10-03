@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Yeshbot Body Mockups</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: tool panel on the left, full-bleed 3D stage on the right; on phones the stage sits on top and the panel scrolls below it */
+:root {
+  --bg: #e7ebee;
+  --panel: #f6f7f8;
+  --fg: #1a2026;
+  --muted: #59656f;
+  --line: #d0d7dc;
+  --accent: #c94f06;
+  --accent-ink: #ffffff;
+  --warn: #b42318;
+  --scene: #dde3e7;
+  --grid: #b4bec6;
+  --display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --body: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111518; --panel: #171c20; --fg: #e4e9ec; --muted: #94a1ab; --line: #283036;
+    --accent: #f27b31; --accent-ink: #1a1006; --warn: #f97066; --scene: #192026; --grid: #2e373e;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111518; --panel: #171c20; --fg: #e4e9ec; --muted: #94a1ab; --line: #283036;
+  --accent: #f27b31; --accent-ink: #1a1006; --warn: #f97066; --scene: #192026; --grid: #2e373e;
+  color-scheme: dark;
+}
+html, body { height: 100%; margin: 0; }
+body { background: var(--bg); color: var(--fg); font: 15px/1.45 var(--body); }
+* { box-sizing: border-box; }
+
+.app { display: grid; grid-template-columns: 300px minmax(0, 1fr); height: 100%; }
+.panel {
+  background: var(--panel); border-right: 1px solid var(--line);
+  display: flex; flex-direction: column; gap: 22px;
+  padding-block: 20px 24px; padding-inline: 18px; overflow-y: auto; min-width: 0;
+}
+.stage { position: relative; min-width: 0; min-height: 0; background: var(--scene); }
+.stage canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+.hint {
+  position: absolute; left: 16px; bottom: 12px; margin: 0;
+  font: 12px/1 var(--mono); color: var(--muted); pointer-events: none;
+}
+
+h1 { font: 700 26px/1 var(--display); letter-spacing: 0.01em; margin: 0; text-transform: uppercase; }
+.sub { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+.label {
+  font: 600 12px/1 var(--display); letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--muted); margin: 0 0 8px;
+}
+
+.bodies { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.bodies button {
+  font: 600 15px/1.1 var(--display); letter-spacing: 0.02em; text-align: left;
+  padding: 9px 10px; border-radius: 4px; border: 1px solid var(--line);
+  background: transparent; color: var(--fg); cursor: pointer;
+}
+.bodies button:hover { border-color: var(--muted); }
+.bodies button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+button:focus-visible, input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.spec h2 { font: 700 22px/1.1 var(--display); margin: 0 0 6px; text-wrap: balance; }
+.spec .note { margin: 0 0 14px; color: var(--muted); font-size: 14px; }
+.spec dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; }
+.spec dt { color: var(--muted); font-size: 13px; }
+.spec dd { margin: 0; font: 500 13px/1.45 var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
+.spec dd.warn { color: var(--warn); }
+
+.opts { display: flex; flex-direction: column; gap: 12px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 4px; overflow: hidden; }
+.seg label { position: relative; cursor: pointer; }
+.seg input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.seg span { display: block; padding: 7px 12px; font: 500 13px/1 var(--mono); color: var(--muted); }
+.seg input:checked + span { background: var(--fg); color: var(--panel); }
+.check { display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; }
+.check input { accent-color: var(--accent); width: 16px; height: 16px; margin: 0; }
+.reset {
+  align-self: flex-start; font: 600 14px/1 var(--display); letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 9px 14px; border-radius: 4px; border: 1px solid var(--line); background: transparent; color: var(--fg); cursor: pointer;
+}
+.reset:hover { border-color: var(--muted); }
+.foot { margin-top: auto; color: var(--muted); font-size: 12px; }
+
+@media (max-width: 760px) {
+  .app { grid-template-columns: minmax(0, 1fr); grid-template-rows: 55% minmax(0, 1fr); }
+  .stage { grid-row: 1; }
+  .panel { grid-row: 2; border-right: 0; border-top: 1px solid var(--line); padding-inline: 16px; }
+  .bodies { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="panel">
+    <header>
+      <h1>Yeshbot Bodies</h1>
+      <p class="sub">Block mockups on the 570 × 500 ladder frame, 370 wheelbase, 570 track. All sizes in mm.</p>
+    </header>
+
+    <section>
+      <p class="label">Body</p>
+      <nav class="bodies" id="bodies" aria-label="Body"></nav>
+    </section>
+
+    <section class="spec" aria-live="polite">
+      <h2 id="spec-name"></h2>
+      <p class="note" id="spec-note"></p>
+      <dl>
+        <dt>Overall L × W × H</dt><dd id="d-overall"></dd>
+        <dt>Body L × W × H</dt><dd id="d-body"></dd>
+        <dt>Body underside</dt><dd id="d-under"></dd>
+        <dt>Tyre to frame gap</dt><dd id="d-gap"></dd>
+      </dl>
+    </section>
+
+    <section class="opts">
+      <div>
+        <p class="label">Tyres</p>
+        <div class="seg" role="radiogroup" aria-label="Tyres">
+          <label><input type="radio" name="tyre" id="tyre-45" value="45" checked><span>45 stock</span></label>
+          <label><input type="radio" name="tyre" id="tyre-65" value="65"><span>65 TPU</span></label>
+        </div>
+      </div>
+      <label class="check"><input type="checkbox" id="xray"> See-through body (shows frame)</label>
+      <button class="reset" id="reset" type="button">Reset view</button>
+    </section>
+
+    <p class="foot">Frame, wheels and track from the as-built notes. Frame height assumes the axle sits level with the rails.</p>
+  </aside>
+
+  <main class="stage" id="stage">
+    <p class="hint">Drag to orbit · right-drag to pan · scroll to zoom</p>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/environments/RoomEnvironment.js"></script>
+<script>
+// Coordinates: x = forward (front is +x), y = up, z = sideways. Units are mm.
+const AX = 185;          // axle x, half the 370 wheelbase
+const TZ = 285;          // wheel centre z, half the 570 track
+const R = 83;            // tyre radius (166 dia)
+const RIM_R = 63.5;      // 127 rim
+const RAIL_OUT = 250;    // outside face of the 4020 side rails (500 frame width)
+const FRAME_Y = R;       // assumption: frame centred on the axle line
+
+// ---------- scene ----------
+const stage = document.getElementById('stage');
+THREE.ColorManagement.legacyMode = false;   // treat hex colours as sRGB
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputEncoding = THREE.sRGBEncoding;
+stage.prepend(renderer.domElement);
+
+const scene = new THREE.Scene();
+if (THREE.RoomEnvironment) {
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new THREE.RoomEnvironment(), 0.04).texture;
+}
+const camera = new THREE.PerspectiveCamera(35, 1, 10, 20000);
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.maxPolarAngle = Math.PI * 0.495;
+controls.minDistance = 300;
+controls.maxDistance = 6000;
+
+function resetView() {
+  const f = camera.aspect < 1 ? 1.7 : 1;   // back off on tall, narrow screens
+  camera.position.set(1500 * f, 900 * f, 1350 * f);
+  controls.target.set(40, 230, 0);
+  controls.update();
+}
+scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8f94, 0.55));
+const sun = new THREE.DirectionalLight(0xffffff, 1.1);
+sun.position.set(900, 1600, 700);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, { left: -900, right: 900, top: 900, bottom: -900, near: 100, far: 4000 });
+sun.shadow.bias = -0.0005;
+scene.add(sun);
+
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(8000, 8000), new THREE.ShadowMaterial({ opacity: 0.18 }));
+ground.rotation.x = -Math.PI / 2;
+ground.receiveShadow = true;
+scene.add(ground);
+let grid = null;
+
+function applyTheme() {
+  const css = getComputedStyle(document.documentElement);
+  scene.background = new THREE.Color(css.getPropertyValue('--scene').trim());
+  if (grid) scene.remove(grid);
+  const g = new THREE.Color(css.getPropertyValue('--grid').trim());
+  grid = new THREE.GridHelper(3000, 30, g, g);   // 100 mm squares
+  grid.position.y = 0.5;
+  scene.add(grid);
+}
+applyTheme();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
+new MutationObserver(applyTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+// ---------- materials ----------
+const mat = (color, o = {}) => new THREE.MeshStandardMaterial({ color, roughness: 0.5, metalness: 0.05, ...o });
+const M = {
+  alu: () => mat(0xb9bfc5, { metalness: 0.7, roughness: 0.35 }),
+  tyre: () => mat(0x1d1f21, { roughness: 0.9 }),
+  rim: () => mat(0x8a9097, { metalness: 0.6, roughness: 0.35 }),
+  print: () => mat(0x34383c, { roughness: 0.7 }),
+  glass: () => mat(0x1b2530, { roughness: 0.08, metalness: 0.3 }),
+  chrome: () => mat(0xd6dbe0, { metalness: 1, roughness: 0.18 }),
+  black: () => mat(0x202326, { roughness: 0.6 }),
+  lamp: () => mat(0xf3f1e6, { roughness: 0.15, emissive: 0x2a2a20 }),
+  tail: () => mat(0xb3141c, { roughness: 0.25, emissive: 0x300000 }),
+  amber: () => mat(0xe08a12, { roughness: 0.25 }),
+};
+
+// ---------- geometry helpers ----------
+function shade(mesh) { mesh.castShadow = true; mesh.receiveShadow = true; return mesh; }
+
+// Box from extents.
+function box(x0, x1, y0, y1, z0, z1, material) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), material);
+  m.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2);
+  return shade(m);
+}
+// Same box on both sides of the centreline.
+function boxPair(x0, x1, y0, y1, zIn, zOut, material) {
+  return [box(x0, x1, y0, y1, zIn, zOut, material), box(x0, x1, y0, y1, -zOut, -zIn, material)];
+}
+// Vertical 2020 extrusion with a hint of its slots.
+function post2020(x, y0, y1, z, material) {
+  const g = new THREE.Group();
+  g.add(box(x - 10, x + 10, y0, y1, z - 10, z + 10, material));
+  const slot = M.black();
+  g.add(box(x - 3, x + 3, y0 + 2, y1 - 2, z - 10.5, z + 10.5, slot));
+  g.add(box(x - 10.5, x + 10.5, y0 + 2, y1 - 2, z - 3, z + 3, slot));
+  return g;
+}
+// Beam in the x-y plane from p1 to p2, thickness t, depth d (z), centred at z.
+function beam(p1, p2, t, d, z, material) {
+  const dx = p2[0] - p1[0], dy = p2[1] - p1[1];
+  const m = new THREE.Mesh(new THREE.BoxGeometry(Math.hypot(dx, dy), t, d), material);
+  m.position.set((p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2, z);
+  m.rotation.z = Math.atan2(dy, dx);
+  return shade(m);
+}
+// Round lamp facing along x (dir +1 front, -1 rear).
+function lamp(x, y, z, r, material, dir = 1, len = 18) {
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, len, 32), material);
+  m.rotation.z = Math.PI / 2;
+  m.position.set(x + dir * len / 2, y, z);
+  return shade(m);
+}
+function ring(x, y, z, r, material) {
+  const m = new THREE.Mesh(new THREE.TorusGeometry(r, 2.5, 8, 32), material);
+  m.rotation.y = Math.PI / 2;
+  m.position.set(x, y, z);
+  return m;
+}
+
+// Open polyline with optional corner radius per point: [x, y, r].
+function roundPoly(pts) {
+  const out = [];
+  pts.forEach((p, i) => {
+    const r = p[2] || 0;
+    if (!r || i === 0 || i === pts.length - 1) { out.push([p[0], p[1]]); return; }
+    const a = pts[i - 1], b = pts[i + 1];
+    const la = Math.hypot(a[0] - p[0], a[1] - p[1]), lb = Math.hypot(b[0] - p[0], b[1] - p[1]);
+    const ra = Math.min(r, la / 2), rb = Math.min(r, lb / 2);
+    const s = [p[0] + (a[0] - p[0]) / la * ra, p[1] + (a[1] - p[1]) / la * ra];
+    const e = [p[0] + (b[0] - p[0]) / lb * rb, p[1] + (b[1] - p[1]) / lb * rb];
+    for (let k = 0; k <= 8; k++) {
+      const t = k / 8, u = 1 - t;
+      out.push([u * u * s[0] + 2 * u * t * p[0] + t * t * e[0], u * u * s[1] + 2 * u * t * p[1] + t * t * e[1]]);
+    }
+  });
+  return out;
+}
+
+// Bottom edge from rear (xr) to front (xf) at height yb, notched by wheel arches of radius ar.
+function archedBottom(xr, xf, yb, ar) {
+  const out = [];
+  for (const cx of [-AX, AX]) {
+    const dy = yb - R, dx = Math.sqrt(ar * ar - dy * dy);
+    let a0 = Math.atan2(dy, -dx);
+    const a1 = Math.atan2(dy, dx);
+    if (a0 < 0) a0 += 2 * Math.PI;   // go over the top of the wheel, not under it
+    for (let k = 0; k <= 24; k++) {
+      const a = a0 + (a1 - a0) * k / 24;
+      out.push([cx + ar * Math.cos(a), R + ar * Math.sin(a)]);
+    }
+  }
+  return out.filter(p => p[0] > xr && p[0] < xf);
+}
+
+// Side profile extruded across the width.
+function prism(pts, width, material, bevel = 0) {
+  const shape = new THREE.Shape(pts.map(p => new THREE.Vector2(p[0], p[1])));
+  const depth = Math.max(1, width - 2 * bevel);
+  const g = new THREE.ExtrudeGeometry(shape, {
+    depth, curveSegments: 16, bevelEnabled: bevel > 0,
+    bevelThickness: bevel, bevelSize: bevel, bevelOffset: -bevel, bevelSegments: 4,   // round the edges without growing the outline
+  });
+  g.translate(0, 0, -depth / 2);
+  return shade(new THREE.Mesh(g, material));
+}
+function prismAt(pts, width, z, material) {
+  const m = prism(pts, width, material);
+  m.position.z = z;
+  return m;
+}
+
+// A car-style body: lower shell with arches, glasshouse, roof cap.
+// top runs from front-bottom over the bonnet and roofline to rear-bottom.
+function carShell({ top, yb, W, color, glass, roof, roofColor, archR = 108, glassInset = 34, bevel = 16 }) {
+  const g = new THREE.Group();
+  const xf = top[0][0], xr = top[top.length - 1][0];
+  const paint = mat(color, { roughness: 0.35, metalness: 0.2 });
+  g.add(prism([...roundPoly(top), ...archedBottom(xr, xf, yb, archR)], W, paint, bevel));
+  if (glass) g.add(prism(roundPoly(glass), W - 2 * glassInset, M.glass()));
+  if (roof) g.add(prism(roundPoly(roof), W - 2 * glassInset + 18, roofColor ? mat(roofColor, { roughness: 0.4 }) : paint, 6));
+  g.userData.paint = paint;
+  return g;
+}
+
+// ---------- frame + wheels ----------
+function buildFrame() {
+  const g = new THREE.Group();
+  const alu = M.alu();
+  const y0 = FRAME_Y - 10, y1 = FRAME_Y + 10;
+  // 4020 side rails, flat
+  g.add(...boxPair(-265, 265, y0, y1, RAIL_OUT - 40, RAIL_OUT, alu));
+  // 2020 end caps, 460 long
+  g.add(box(-285, -265, y0, y1, -230, 230, alu), box(265, 285, y0, y1, -230, 230, alu));
+  // 2020 centre bars, bays 135 | 110 | 135
+  g.add(...boxPair(-265, 265, y0, y1, 55, 75, alu));
+  return g;
+}
+function buildWheels(tw) {
+  const g = new THREE.Group();
+  for (const x of [-AX, AX]) for (const s of [-1, 1]) {
+    const w = new THREE.Group();
+    const tyre = shade(new THREE.Mesh(new THREE.CylinderGeometry(R, R, tw, 48), M.tyre()));
+    const rim = shade(new THREE.Mesh(new THREE.CylinderGeometry(RIM_R, RIM_R, tw + 2, 40), M.rim()));
+    const hub = shade(new THREE.Mesh(new THREE.CylinderGeometry(30, 30, tw + 6, 24), M.black()));
+    [tyre, rim, hub].forEach(m => { m.rotation.x = Math.PI / 2; w.add(m); });
+    w.position.set(x, R, s * TZ);
+    g.add(w);
+    // printed clamp from rail to tyre
+    const zi = TZ - tw / 2;
+    if (zi > RAIL_OUT) g.add(box(x - 22, x + 22, R - 30, R + 18, s > 0 ? RAIL_OUT : -zi, s > 0 ? zi : -RAIL_OUT, M.print()));
+  }
+  return g;
+}
+
+// ---------- bodies ----------
+function mini(L, H, note, label) {
+  const W = 650, xf = L / 2, xr = -L / 2, yb = 78;
+  const belt = H * 0.52, fl = H * 0.46;
+  const ws = xf - L * 0.30;                 // windscreen base
+  const g = carShell({
+    W, yb, color: 0x1f4d36, roofColor: 0xf1efe8,
+    top: [[xf - 6, yb], [xf + 4, H * 0.22, 14], [xf, fl, 40], [ws, belt, 70], [xr + 16, belt + 4, 40], [xr - 4, H * 0.3, 30], [xr + 4, yb]],
+    glass: [[ws + 8, belt - 14], [ws - H * 0.12, H * 0.94, 30], [xr + L * 0.085, H * 0.94, 30], [xr + L * 0.045, belt - 14]],
+    roof: [[ws - H * 0.115, H * 0.93], [ws - H * 0.125, H, 12], [xr + L * 0.07, H, 12], [xr + L * 0.07, H * 0.93]],
+  });
+  const hy = H * 0.37, chrome = M.chrome();
+  for (const s of [-1, 1]) {
+    g.add(lamp(xf - 8, hy, s * W * 0.33, 44, chrome, 1, 14), lamp(xf + 4, hy, s * W * 0.33, 36, M.lamp(), 1, 6));
+    g.add(lamp(xf - 4, H * 0.24, s * W * 0.22, 14, M.amber(), 1, 10));
+    g.add(box(xr - 8, xr + 4, H * 0.3, H * 0.44, s * W * 0.40 - 26, s * W * 0.40 + 26, M.tail()));
+  }
+  // grille, bumpers
+  g.add(box(xf - 6, xf + 8, H * 0.2, H * 0.36, -W * 0.19, W * 0.19, M.black()));
+  for (let y = H * 0.22; y < H * 0.35; y += 14) g.add(box(xf + 7, xf + 10, y, y + 3, -W * 0.18, W * 0.18, chrome));
+  g.add(box(xf, xf + 16, H * 0.14, H * 0.18, -W / 2 + 10, W / 2 - 10, chrome));
+  g.add(box(xr - 16, xr, H * 0.14, H * 0.18, -W / 2 + 10, W / 2 - 10, chrome));
+  // bonnet stripes
+  for (const z of [-50, 50]) g.add(prismAt(roundPoly([[xf + 1, fl - 6], [xf + 1, fl + 1], [ws, belt + 1], [ws, belt - 6]]), 46, z, mat(0xf1efe8)));
+  return { group: g, name: label, note };
+}
+
+function x5() {
+  const W = 650, L = 780, H = 640, xf = L / 2, xr = -L / 2, yb = 96;
+  const g = carShell({
+    W, yb, color: 0x55606a,
+    top: [[xf - 10, yb], [xf + 6, 200, 20], [xf, 310, 40], [xf - 200, 360, 80], [xr + 20, 372, 40], [xr - 4, 300, 30], [xr + 4, yb]],
+    glass: [[xf - 196, 350], [xf - 330, 572, 40], [xr + 60, 584, 30], [xr + 12, 368]],
+    roof: [[xf - 330, 566], [xf - 336, 600, 18], [xr + 50, 606, 18], [xr + 58, 572]],
+  });
+  for (const s of [-1, 1]) {
+    // headlight units with the corona rings
+    g.add(box(xf - 36, xf - 4, 268, 318, s * 190, s * 300, M.black()));
+    g.add(ring(xf - 2, 292, s * 218, 22, M.lamp()), ring(xf - 2, 292, s * 268, 22, M.lamp()));
+    // kidneys
+    g.add(box(xf - 8, xf + 10, 222, 300, s * 18, s * 78, M.chrome()));
+    g.add(box(xf + 8, xf + 12, 230, 292, s * 24, s * 72, M.black()));
+    // fogs, roof rails, tail lights
+    g.add(lamp(xf - 2, 150, s * 250, 16, M.lamp(), 1, 8));
+    g.add(box(xf - 360, xr + 70, 606, 618, s * 250, s * 272, M.chrome()));
+    g.add(box(xr - 10, xr + 30, 300, 350, s * 210, s * 318, M.tail()));
+  }
+  g.add(box(xf - 14, xf + 12, 110, 140, -W / 2 + 12, W / 2 - 12, M.black()));
+  g.add(box(xr - 12, xr + 14, 110, 150, -W / 2 + 12, W / 2 - 12, M.black()));
+  return { group: g, name: 'BMW X5 (E70), chibi', note: 'Tall, square and fairly true to the E70 shape. The big flat flanks are easy to print as panels.' };
+}
+
+function colorado() {
+  const W = 650, xf = 400, xr = -420, yb = 96, tubFloor = 250, tubTop = 350, cab = -70;
+  const g = carShell({
+    W, yb, color: 0x9a1b1f,
+    top: [[xf - 10, yb], [xf + 8, 210, 16], [xf, 318, 30], [xf - 170, 342, 60], [cab, 348], [cab, tubFloor], [xr + 2, tubFloor], [xr, yb]],
+    glass: [[xf - 166, 336], [xf - 290, 548, 30], [cab + 24, 556, 20], [cab + 14, 340]],
+    roof: [[xf - 290, 540], [xf - 296, 572, 14], [cab + 6, 574, 14], [cab + 10, 540]],
+  });
+  const paint = g.userData.paint;
+  // tub walls and tailgate
+  g.add(...boxPair(xr, cab, tubFloor - 4, tubTop, W / 2 - 34, W / 2 - 6, paint));
+  g.add(box(xr - 4, xr + 14, tubFloor - 4, tubTop, -W / 2 + 6, W / 2 - 6, paint));
+  g.add(box(xr - 6, xr - 2, tubTop - 40, tubTop - 28, -50, 50, M.black()));
+  g.add(box(xr + 14, cab, tubFloor - 4, tubFloor + 2, -W / 2 + 34, W / 2 - 34, M.black()));
+  for (const s of [-1, 1]) {
+    g.add(box(xf - 20, xf + 6, 250, 300, s * 190, s * 300, M.lamp()));
+    g.add(box(xr - 10, xr + 6, 255, 340, s * 270, s * 318, M.tail()));
+    g.add(box(cab - 6, cab + 40, 470, 476, s * 200, s * 300, M.black()));   // mirrors line
+  }
+  g.add(box(xf - 4, xf + 12, 250, 300, -180, 180, M.chrome()));
+  g.add(box(xf - 4, xf + 14, 120, 160, -W / 2 + 10, W / 2 - 10, M.chrome()));
+  g.add(box(xr - 14, xr + 4, 110, 140, -W / 2 + 10, W / 2 - 10, M.black()));
+  return { group: g, name: 'Holden RC Colorado, chibi', note: 'Shown as a crew cab with a tub. The tub is an open box you could use for storage or a lid over the electronics.' };
+}
+
+function yaris() {
+  const W = 650, L = 710, xf = L / 2, xr = -L / 2, yb = 84;
+  const g = carShell({
+    W, yb, color: 0x2e6fbf,
+    top: [[xf - 8, yb], [xf + 6, 170, 26], [xf - 6, 268, 60], [xf - 190, 330, 70], [xr + 20, 350, 40], [xr - 4, 270, 40], [xr + 4, yb]],
+    glass: [[xf - 186, 322], [xf - 330, 530, 46], [xr + 70, 532, 30], [xr + 12, 344]],
+    roof: [[xf - 330, 522], [xf - 336, 554, 22], [xr + 60, 556, 22], [xr + 66, 522]],
+  });
+  for (const s of [-1, 1]) {
+    g.add(beam([xf - 70, 286], [xf + 2, 254], 26, 110, s * 240, M.lamp()));
+    g.add(box(xr - 8, xr + 30, 278, 340, s * 230, s * 316, M.tail()));
+  }
+  g.add(box(xf - 8, xf + 10, 120, 200, -170, 170, M.black()));
+  g.add(box(xf - 2, xf + 8, 230, 250, -60, 60, M.chrome()));
+  g.add(box(xr - 12, xr + 10, 100, 140, -W / 2 + 12, W / 2 - 12, M.black()));
+  return { group: g, name: 'Toyota Yaris (XP150), chibi', note: 'Third-gen hatch. Short bonnet and a near-vertical hatch, so it suits the short wheelbase best of the cars.' };
+}
+
+function golfCart() {
+  const W = 640, xf = 380, xr = -390, yb = 100, floor = 206, seatY = 300;
+  const g = carShell({
+    W, yb, color: 0x2f6b4f, archR: 106, bevel: 14,
+    top: [[xf - 8, yb], [xf + 10, 250, 30], [xf - 20, 344, 40], [250, 340, 30], [212, floor, 14], [-90, floor, 10], [-100, seatY, 10], [xr + 10, seatY, 20], [xr, yb]],
+  });
+  const cream = mat(0xe8e0cc, { roughness: 0.6 }), alu = M.alu();
+  // seat
+  g.add(box(-330, -100, seatY, seatY + 34, -270, 270, cream));
+  g.add(box(-352, -326, seatY + 30, seatY + 210, -270, 270, cream));
+  // 2020 roof posts and canopy
+  for (const s of [-1, 1]) {
+    g.add(post2020(260, 334, 790, s * 290, alu));
+    g.add(post2020(-370, seatY, 790, s * 290, alu));
+    g.add(lamp(xf + 6, 260, s * 200, 28, M.lamp(), 1, 10));
+    g.add(box(xr - 8, xr + 4, 230, 270, s * 230, s * 300, M.tail()));
+  }
+  g.add(box(-430, 330, 790, 816, -W / 2 - 10, W / 2 + 10, mat(0xf1efe8, { roughness: 0.6 })));
+  // windscreen
+  g.add(box(268, 274, 360, 760, -280, 280, mat(0x9fb4c4, { transparent: true, opacity: 0.25, roughness: 0.05 })));
+  // steering wheel
+  g.add(beam([250, 340], [150, 470], 16, 16, 120, M.black()));
+  const wheel = new THREE.Mesh(new THREE.TorusGeometry(60, 7, 10, 36), M.black());
+  wheel.position.set(150, 470, 120); wheel.rotation.y = Math.PI / 2; wheel.rotation.x = 0; wheel.rotation.z = 0.5;
+  g.add(shade(wheel));
+  g.add(box(xf - 2, xf + 16, 120, 160, -W / 2 + 10, W / 2 - 10, M.black()));
+  return { group: g, name: 'Golf cart, chibi', note: 'Roof posts are 2020 extrusion. The open sides and lift-out seat give easy access to the electronics.' };
+}
+
+function skidSteer() {
+  const g = new THREE.Group();
+  const paint = mat(0xe3a41a, { roughness: 0.45, metalness: 0.1 });
+  const dark = M.black(), alu = M.alu();
+  // lower chassis between the wheels, fenders over them
+  g.add(box(-300, 280, 70, 205, -248, 248, paint));
+  for (const x of [-AX, AX]) g.add(...boxPair(x - 112, x + 112, 188, 200, 248, 330, dark));
+  // engine hood at the back with grille
+  g.add(box(-330, -120, 200, 330, -235, 235, paint));
+  for (let y = 220; y < 315; y += 16) g.add(box(-336, -330, y, y + 8, -180, 180, dark));
+  // cab: 2020 ROPS posts, roof, seat, floor
+  for (const s of [-1, 1]) {
+    g.add(post2020(170, 205, 540, s * 165, alu));
+    g.add(post2020(-110, 330, 540, s * 165, alu));
+    for (let y = 260; y < 520; y += 40) g.add(box(-100, 160, y, y + 6, s * 168 - 3, s * 168 + 3, dark));  // side screen
+  }
+  g.add(box(-140, 200, 540, 562, -195, 195, paint));
+  g.add(box(-90, -10, 230, 290, -90, 90, dark), box(-110, -80, 290, 420, -90, 90, dark));
+  g.add(lamp(200, 528, 150, 16, M.lamp(), 1, 10), lamp(200, 528, -150, 16, M.lamp(), 1, 10));
+  // lift arms: towers at the back, arms over the cab sides down to the bucket
+  for (const s of [-1, 1]) {
+    const z = s * 232;
+    g.add(box(-330, -230, 200, 400, z - 14, z + 14, paint));
+    g.add(beam([-280, 380], [-40, 470], 44, 30, z, paint));
+    g.add(beam([-40, 470], [230, 420], 44, 30, z, paint));
+    g.add(beam([230, 420], [305, 200], 44, 30, z, paint));
+    g.add(beam([-80, 260], [120, 410], 22, 22, z + s * 26, alu));   // lift ram
+  }
+  g.add(box(-56, -24, 446, 478, -232, 232, paint));                // cross tube behind the cab
+  // bucket
+  g.add(prism([[292, 64], [470, 64], [470, 78], [326, 96], [318, 300], [292, 312]], 640, dark));
+  g.add(...[-1, 1].map(s => prismAt([[300, 66], [466, 70], [306, 300]], 10, s * 315, dark)));
+  return { group: g, name: 'Skid steer', note: 'Fits the near-square footprint best. ROPS posts are 2020, the arms and bucket are static here, and the bucket sits 64 mm off the ground.' };
+}
+
+const BODIES = [
+  { id: 'mini', label: 'Mini · chibi', make: () => mini(720, 560, 'Squashed to fit the frame. 720 long on a 370 wheelbase, so it reads as a cartoon Mini: mostly face and roof.', 'Classic Mini, chibi') },
+  { id: 'mini-long', label: 'Mini · stretched', make: () => mini(1000, 480, 'Overhangs pushed out to about 1000 long. Still only about 1.5× its width (a real Mini is 2.2×), and the overhangs will dig in on sand.', 'Classic Mini, stretched') },
+  { id: 'x5', label: 'X5 E70', make: x5 },
+  { id: 'colorado', label: 'RC Colorado', make: colorado },
+  { id: 'yaris', label: 'Yaris', make: yaris },
+  { id: 'golf', label: 'Golf cart', make: golfCart },
+  { id: 'skid', label: 'Skid steer', make: skidSteer },
+];
+
+// ---------- state ----------
+const frame = buildFrame();
+scene.add(frame);
+let tyreW = 45, wheels = null, body = null, current = null;
+const xray = document.getElementById('xray');
+
+function setWheels(w) {
+  tyreW = w;
+  if (wheels) scene.remove(wheels);
+  wheels = buildWheels(w);
+  scene.add(wheels);
+}
+function applyXray() {
+  if (!body) return;
+  body.traverse(o => {
+    if (!o.material) return;
+    if (o.material.userData.baseOpacity === undefined) o.material.userData.baseOpacity = o.material.opacity;
+    const on = xray.checked;
+    o.material.transparent = on || o.material.userData.baseOpacity < 1;
+    o.material.opacity = on ? Math.min(0.22, o.material.userData.baseOpacity) : o.material.userData.baseOpacity;
+    o.material.depthWrite = !on;
+    o.castShadow = !on;
+    o.material.needsUpdate = true;
+  });
+}
+
+const fmt = n => Math.round(n).toString();
+const dims = b => `${fmt(b.max.x - b.min.x)} × ${fmt(b.max.z - b.min.z)} × ${fmt(b.max.y - b.min.y)}`;
+
+function updateSpec() {
+  const bodyBox = new THREE.Box3().setFromObject(body);
+  const all = bodyBox.clone().union(new THREE.Box3().setFromObject(wheels)).union(new THREE.Box3().setFromObject(frame));
+  all.min.y = 0;
+  document.getElementById('spec-name').textContent = current.name;
+  document.getElementById('spec-note').textContent = current.note;
+  document.getElementById('d-overall').textContent = dims(all);
+  document.getElementById('d-body').textContent = dims(bodyBox);
+  document.getElementById('d-under').textContent = `${fmt(bodyBox.min.y)} mm`;
+  const gap = TZ - tyreW / 2 - RAIL_OUT;
+  const dd = document.getElementById('d-gap');
+  dd.textContent = `${gap.toFixed(1)} mm${gap < 5 ? ' · tight' : ''}`;
+  dd.classList.toggle('warn', gap < 5);
+}
+
+function show(id) {
+  const def = BODIES.find(b => b.id === id) || BODIES[0];
+  if (body) scene.remove(body);
+  current = def.make();
+  body = current.group;
+  scene.add(body);
+  applyXray();
+  updateSpec();
+  document.querySelectorAll('#bodies button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.id === def.id)));
+  try { history.replaceState(null, '', '#' + def.id); } catch (e) {}
+}
+
+const nav = document.getElementById('bodies');
+BODIES.forEach(b => {
+  const btn = document.createElement('button');
+  btn.type = 'button'; btn.dataset.id = b.id; btn.textContent = b.label;
+  btn.addEventListener('click', () => show(b.id));
+  nav.append(btn);
+});
+document.querySelectorAll('input[name="tyre"]').forEach(r => r.addEventListener('change', () => { setWheels(+r.value); updateSpec(); }));
+xray.addEventListener('change', applyXray);
+document.getElementById('reset').addEventListener('click', resetView);
+
+setWheels(45);
+show(location.hash.slice(1));
+
+// ---------- render loop ----------
+function resize() {
+  const w = stage.clientWidth, h = stage.clientHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / Math.max(1, h);
+  camera.updateProjectionMatrix();
+}
+new ResizeObserver(resize).observe(stage);
+resize();
+resetView();
+renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); });
+</script>
+</body>
+</html>
